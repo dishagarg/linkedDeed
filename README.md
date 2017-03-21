@@ -4,7 +4,8 @@ A website to connect you to your best suited job.
 
 
 ## How to run it?
-1. Step 1: In this directory, run this command `bower install`.
-2. Step 2: Open index.html
+- Step 1: Go to linkedDeed/ directory, run this command `python app.py`.
+- Step 2: Open linkedDeed/templates/index.html in the browser.
+- Step 3: Fill up the form and submit. 
 
 
