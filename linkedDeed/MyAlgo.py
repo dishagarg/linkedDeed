@@ -38,12 +38,12 @@ def select_from():
 
 
 def jobs_calc(job, text):
-    """Calculate how many skills match."""
-    temp = 0
-    for uni_word in text:
-        if uni_word in job:
-            temp += 1
-    return temp
+    """Counting how many skills match."""
+    count = 0
+    for uni_word in job:
+        if uni_word in text:
+            count += 1
+    return count
 
 
 def data_cleanup(jobs, skills, txt):
@@ -70,7 +70,7 @@ def accuracy(skill_list, text, job_list):
     match = []  # match depending upon the skills required.
     for job in job_list:
         x = jobs_calc(job, text)
-        y = jobs_calc(job, skill_list)
+        y = jobs_calc(skill_list, job)
         # skills_required.append(x)
         # skills_match.append(y)
         match.append((float(y) / x) * 100)
