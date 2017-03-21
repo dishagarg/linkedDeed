@@ -1,0 +1,19 @@
+{% extends "ass.html" %}
+{% block body %}
+        <div class="row row-content">
+           <div class="col-xs-12">
+               <h2>Jobs<small>({{ entries[0][0] }})</small></h2>
+                <ul>
+                
+                {% for job in entries %}
+                    <li>
+                    {% for j in job %}
+                    {% if not loop.first %}{{ j }}<br />{% endif %}
+                    {% endfor %}
+                    </li>
+                {% endfor %}
+               </ul>
+            </div>
+        </div>
+{% endblock %}
+
