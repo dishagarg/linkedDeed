@@ -99,17 +99,17 @@ def indeed_jobs(city=None, state=None):
                 job_descriptions.append(final_description)
                 final_URLs.append(job_URLS[j])
 
-        #mystring = (''.join([i if ord(i) < 128 else ' ' for i in unicode(final_description,"utf-8")]))
-        #print mystring.replace('\n', ' ').replace('\r', '')
+        # mystring = (''.join([i if ord(i) < 128 else ' ' for i in unicode(final_description,"utf-8")]))
+        # print mystring.replace('\n', ' ').replace('\r', '')
         # code for database connectivity
         import sqlite3
 
         conn = sqlite3.connect('stuffToPlot.db')
         c = conn.cursor()
         c.execute('DROP TABLE IF EXISTS stuf')
-        c.execute('CREATE TABLE stuf(ID INTEGER PRIMARY KEY AUTOINCREMENT, WHAT TEXT, URL TEXT, DESCRIPTION TEXT)')
+        c.execute('CREATE TABLE stuf(ID INTEGER PRIMARY KEY AUTOINCREMENT, WHAT TEXT, URL TEXT, ACCURACY REAL, DESCRIPTION TEXT)')
         for i in range(len(job_descriptions)):
-            c.execute('INSERT INTO stuf (ID, WHAT, URL, DESCRIPTION) VALUES(?, ?, ?, ?)', ((i + 1), final_job.replace("+", " "), final_URLs[i], job_descriptions[i], ))
+            c.execute('INSERT INTO stuf (ID, WHAT, URL, ACCURACY, DESCRIPTION) VALUES(?, ?, ?, ?, ?)', ((i + 1), final_job.replace("+", " "), final_URLs[i], 0.0, job_descriptions[i], ))
             conn.commit()
         c.close()
         conn.close()
