@@ -33,8 +33,8 @@ def clean_up(dirty_data):
                                      replace('\r', ' ')).encode('ascii', 'ignore')
         temp, sep, tail = temp.partition('Apply')
         clean_data.append(temp)
-    print "*****************"
-    print clean_data
+    """print "*****************"
+                print clean_data"""
     return clean_data
 
 
@@ -81,7 +81,7 @@ def indeed_jobs(f_job, city=None, state=None):
     job_descriptions = []  # Store all our descriptions in this list
     final_URLs = []
 
-    for i in xrange(0, 1):  # Loop through all of our search result pages
+    for i in xrange(0, num_pages):  # Loop through all of our search result pages
         print 'Getting page', i
         start_num = str(i * 1)  # Assign the multiplier of 10 to view the pages we want
         current_page = ''.join([final_site, '&start=', start_num])
@@ -93,14 +93,11 @@ def indeed_jobs(f_job, city=None, state=None):
         for script in page_obj(["script", "style"]):
             script.extract()
 
-        # div = page_obj.find(id = 'resultsCol')
-
         print "And that's the result col"
         job_link_area = page_obj.find(id='resultsCol')  # The center column on the page where the job postings exist
         job_URLS = [base_url + link.get('href') for link in job_link_area.find_all('a', href=True)]
         job_URLS = filter(lambda x: 'clk' in x, job_URLS)
 
-        # for j in xrange(0, 1):
         for j in xrange(0, len(job_URLS)):
             final_description = job_extractor(job_URLS[j])
             if final_description:  # So that we only append when the website was accessed correctly

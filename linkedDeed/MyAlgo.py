@@ -49,7 +49,7 @@ def jobs_calc(job, text):
 def data_cleanup(jobs, skills, txt):
     """Clean up of each job description and skills."""
     for i in range(len(jobs)):
-        jobs[i] = unicodedata.normalize('NFKD', "".join(jobs[i]).replace('\n', ' ').replace('\t', ' ')).encode('ascii','ignore')
+        jobs[i] = unicodedata.normalize('NFKD', "".join(jobs[i])).encode('ascii','ignore')
 
     # cz skills will just be in 1 cell
     skills[0] = unicodedata.normalize('NFKD', "".join(skills[0])).encode('ascii', 'ignore')
