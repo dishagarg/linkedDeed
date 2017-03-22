@@ -1,6 +1,7 @@
 from bs4 import BeautifulSoup, SoupStrainer  # For HTML parsing
 import urllib2  # Website connections
 import re  # Regular expressions
+import unicodedata
 from time import sleep  # To prevent overwhelming the server between connections
 import pandas as pd  # For converting results to a dataframe and bar chart plots
 
@@ -13,17 +14,28 @@ def job_extractor(website):
     except:
         return   # Need this in case the website isn't there anymore or some other weird connection problem 
     soup_obj = BeautifulSoup(site, "html.parser")  # Get the html from the site
-
     for script in soup_obj(["script", "style"]):
         script.extract()  # Remove these two elements from the BS4 object
-
     company = soup_obj.find('span', {'class': 'company'})
     if company:
         company_name = company.get_text()
     # print company_name
-
     content = soup_obj.get_text()  # Get the text from this
     return content
+
+
+def clean_up(dirty_data):
+    """Clean up the dirty data."""
+    clean_data = []
+    for i in range(len(dirty_data)):
+        temp = unicodedata.normalize('NFKD', "".join(dirty_data[i]).replace('\n', ' ').
+                                     replace('\[[0-9]*\]', "").replace(' +', ' ').replace('\t', "").
+                                     replace('\r', ' ')).encode('ascii', 'ignore')
+        temp, sep, tail = temp.partition('Apply')
+        clean_data.append(temp)
+    print "*****************"
+    print clean_data
+    return clean_data
 
 
 def indeed_jobs(f_job, city=None, state=None):
@@ -68,9 +80,8 @@ def indeed_jobs(f_job, city=None, state=None):
     # This will be how we know the number of times we need to iterate over each new search result page
     job_descriptions = []  # Store all our descriptions in this list
     final_URLs = []
-    new_job_desc = []
 
-    for i in xrange(0, num_pages):  # Loop through all of our search result pages
+    for i in xrange(0, 1):  # Loop through all of our search result pages
         print 'Getting page', i
         start_num = str(i * 1)  # Assign the multiplier of 10 to view the pages we want
         current_page = ''.join([final_site, '&start=', start_num])
@@ -96,10 +107,7 @@ def indeed_jobs(f_job, city=None, state=None):
                 job_descriptions.append(final_description)
                 final_URLs.append(job_URLS[j])
 
-        for j in range(len(job_descriptions)):
-            mystring = ''.join(job_descriptions[j])
-            new_job_desc.append(mystring.replace('\n', ' ').replace('\r', '').replace('\t', '').replace(u'\xa0', ' ').replace(u'\x95', ' '))
-
+    new_job_desc = clean_up(job_descriptions)
     # code for database connectivity
     import sqlite3
 
@@ -116,7 +124,7 @@ def indeed_jobs(f_job, city=None, state=None):
     print 'Done with collecting the job postings!'
     print 'There were', len(job_descriptions), 'jobs successfully found.'
 
-city='Victoria'
+"""city='Victoria'
 state='BC'
 f_job='Software Developer'
-indeed_jobs(f_job, city=city, state=state)
+indeed_jobs(f_job, city=city, state=state)"""
