@@ -1,11 +1,11 @@
 drop table if exists stuffToPlot;
-CREATE TABLE stuffToPlot(
-	id integer primary key autoincrement,
-	title text not null,
-	description text not null
+drop table if exists linkedIn;
+CREATE TABLE linkedIn(
+	ID integer primary key autoincrement,
+	EMAIL text,
+	PASSWORD text,
+	WHAT text,
+	CITY text,
+	STATE text,
+	SKILLS text
 );
-INSERT INTO stuffToPlot VALUES(1, 'Software developer','Java, Python, PHP');
-INSERT INTO stuffToPlot VALUES(2, 'Software developer','Java, Python, PHP, SQL');
-INSERT INTO stuffToPlot VALUES(3, 'Software developer','Java, Python');
-INSERT INTO stuffToPlot VALUES(4, 'Software developer','Java, Python, PHP, C');
-INSERT INTO stuffToPlot VALUES(5, 'Software developer','Java, Python, PHP, B');

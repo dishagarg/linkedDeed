@@ -1,20 +1,22 @@
-from __future__ import print_function # In python 2.
+from __future__ import print_function  # In python 2.
 import sys
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+import indeed as ind
+import MyAlgo as mal
 
 app = Flask(__name__.split('.')[0])   # create the application instance
 
 
 def connect_db():
-    """Connects to the specific database."""
+    """Connect to the specific database."""
     rv = sqlite3.connect('stuffToPlot.db')
     rv.row_factory = sqlite3.Row
     return rv
 
 
 def init_db():
-    """Initializes the database."""
+    """Initialize the database."""
     db = get_db()
     with app.open_resource('schema.sql', mode='r') as f:
         db.cursor().executescript(f.read())
@@ -22,7 +24,10 @@ def init_db():
 
 
 def get_db():
-    """Opens a new database connection if there is none yet for the
+    """
+    Open a new database connection.
+
+    If there is none yet for the
     current application context.
     """
     if not hasattr(g, 'sqlite_db'):
@@ -32,7 +37,7 @@ def get_db():
 
 @app.teardown_appcontext
 def close_db(error):
-    """Closes the database again at the end of the request."""
+    """Close the database again at the end of the request."""
     if hasattr(g, 'sqlite_db'):
         g.sqlite_db.close()
 
@@ -41,7 +46,7 @@ def close_db(error):
 def show_entries():
     init_db()
     db = get_db()
-    cur = db.execute('select title, description from stuffToPlot order by id desc')
+    cur = db.execute('select WHAT, URL, DESCRIPTION from stuf order by ACCURACY desc')
     entries = cur.fetchall()
     for job in entries:
         print(dir(job), file=sys.stderr)
@@ -67,6 +72,13 @@ def login():
     em = request.form['email']
     pwd = request.form['password']
     what = request.form['what']
+    init_db()
+    db = get_db()
+    db.execute('insert into linkedIn (ID, EMAIL, PASSWORD, WHAT, CITY, STATE, \
+        SKILLS) values (?, ?, ?, ?, ?, ?, ?)', (1, em, pwd, what, 'Victoria', 'BC', 'Java, Python, SQL'))
+    db.commit()
+    ind.indeed_jobs('Software Developer', city='Victoria', state='BC')
+    mal.main()
     return redirect(url_for('show_entries'))
 
 

@@ -30,7 +30,7 @@ def select_from():
     c.close()
     c = conn.cursor()
     skills = []
-    for row in c.execute('SELECT description FROM stuffToPlot'):
+    for row in c.execute('SELECT SKILLS FROM linkedIn'):
         skills.append(row)
     c.close()
     conn.close()
@@ -80,18 +80,23 @@ def accuracy(skill_list, text, job_list):
 def update_table(match):
     """Update it in sqlite and order this in desc."""
     conn = sqlite3.connect('stuffToPlot.db')
-    sql = '''UPDATE stuf SET match = ? WHERE id = ?'''
+    sql = '''UPDATE stuf SET ACCURACY = ? WHERE ID = ?'''
     for i in range(len(match)):
         cur = conn.cursor()
-        cur.execute(sql, match[i], i + 1)
+        cur.execute(sql, (match[i], i + 1))
         conn.commit()
         cur.close()
     conn.close()
 
-txt = read_txt(filename, labels)
-jobs, skills = select_from()
-skill_list, text, job_list = data_cleanup(jobs, skills, txt)
-skills_you_have = jobs_calc(skill_list, text)
 
-match = accuracy(skill_list, text, job_list)
-update_table(match)
+def main():
+    """Start up."""
+    txt = read_txt(filename, labels)
+    jobs, skills = select_from()
+    skill_list, text, job_list = data_cleanup(jobs, skills, txt)
+    skills_you_have = jobs_calc(skill_list, text)
+
+    match = accuracy(skill_list, text, job_list)
+    update_table(match)
+
+main()

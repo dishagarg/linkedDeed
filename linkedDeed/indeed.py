@@ -6,9 +6,7 @@ import pandas as pd  # For converting results to a dataframe and bar chart plots
 
 
 def job_extractor(website):
-    '''
-    Cleans up the raw HTML
-    '''
+    """Clean up the raw HTML."""
     company_name = "Unknown"
     try:
         site = urllib2.urlopen(website).read()  # Connect to the job posting
@@ -28,11 +26,9 @@ def job_extractor(website):
     return content
 
 
-def indeed_jobs(city=None, state=None):
-    '''
-    Inputs the location's city and state and then looks for the job in Indeed.com
-    '''
-    final_job = 'software+developer'  # searching for data scientist exact fit("data scientist" on Indeed search)
+def indeed_jobs(f_job, city=None, state=None):
+    """Input the location's city and state and then look for the job in Indeed."""
+    final_job = f_job.lower().replace(' ', '+')  # searching for data scientist exact fit("data scientist" on Indeed search)
     # Make sure the city specified works properly if it has more than one word (such as San Francisco)
     if city is not None:
         final_city = city.split()
@@ -55,7 +51,7 @@ def indeed_jobs(city=None, state=None):
     # Now find out how many jobs there were
     div = soup.find(id='searchCount')
     # Now extract the total number of jobs found. The 'searchCount' object has this
-    num_jobs_area = soup.find(id='searchCount').string.encode('utf-8')
+    num_jobs_area = div.string.encode('utf-8')
     job_numbers = re.findall('\d+', num_jobs_area)  # Extract the total jobs found from the search result
 
     # print job_numbers
@@ -72,6 +68,7 @@ def indeed_jobs(city=None, state=None):
     # This will be how we know the number of times we need to iterate over each new search result page
     job_descriptions = []  # Store all our descriptions in this list
     final_URLs = []
+    new_job_desc = []
 
     for i in xrange(0, num_pages):  # Loop through all of our search result pages
         print 'Getting page', i
@@ -99,23 +96,27 @@ def indeed_jobs(city=None, state=None):
                 job_descriptions.append(final_description)
                 final_URLs.append(job_URLS[j])
 
-        # mystring = (''.join([i if ord(i) < 128 else ' ' for i in unicode(final_description,"utf-8")]))
-        # print mystring.replace('\n', ' ').replace('\r', '')
-        # code for database connectivity
-        import sqlite3
+        for j in range(len(job_descriptions)):
+            mystring = ''.join(job_descriptions[j])
+            new_job_desc.append(mystring.replace('\n', ' ').replace('\r', '').replace('\t', '').replace(u'\xa0', ' ').replace(u'\x95', ' '))
 
-        conn = sqlite3.connect('stuffToPlot.db')
-        c = conn.cursor()
-        c.execute('DROP TABLE IF EXISTS stuf')
-        c.execute('CREATE TABLE stuf(ID INTEGER PRIMARY KEY AUTOINCREMENT, WHAT TEXT, URL TEXT, ACCURACY REAL, DESCRIPTION TEXT)')
-        for i in range(len(job_descriptions)):
-            c.execute('INSERT INTO stuf (ID, WHAT, URL, ACCURACY, DESCRIPTION) VALUES(?, ?, ?, ?, ?)', ((i + 1), final_job.replace("+", " "), final_URLs[i], 0.0, job_descriptions[i], ))
-            conn.commit()
-        c.close()
-        conn.close()
+    # code for database connectivity
+    import sqlite3
+
+    conn = sqlite3.connect('stuffToPlot.db')
+    c = conn.cursor()
+    c.execute('DROP TABLE IF EXISTS stuf')
+    c.execute('CREATE TABLE stuf(ID INTEGER PRIMARY KEY AUTOINCREMENT, WHAT TEXT, URL TEXT, ACCURACY REAL, DESCRIPTION TEXT)')
+    for i in range(len(job_descriptions)):
+        c.execute('INSERT INTO stuf (ID, WHAT, URL, ACCURACY, DESCRIPTION) VALUES(?, ?, ?, ?, ?)', ((i + 1), f_job, final_URLs[i], 0.0, new_job_desc[i], ))
+    conn.commit()
+    c.close()
+    conn.close()
 
     print 'Done with collecting the job postings!'
     print 'There were', len(job_descriptions), 'jobs successfully found.'
 
-
-indeed_jobs(city='Victoria', state='BC')
+city='Victoria'
+state='BC'
+f_job='Software Developer'
+indeed_jobs(f_job, city=city, state=state)
