@@ -55,6 +55,7 @@ def login():
     db = get_db()
     cur = db.execute('SELECT LOCATION, DESIGNATIONS FROM linkedin_skills WHERE ID=1')
     entry = cur.fetchone()
+    print(entry[1].split(", "), file=sys.stderr)
     return render_template('form.html', jobs=entry[1].split(", "), location=entry[0].split(", "))
 
 

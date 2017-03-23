@@ -1,3 +1,5 @@
+from __future__ import print_function  # In python 2.
+import sys
 import requests
 from bs4 import BeautifulSoup
 import json
@@ -78,7 +80,7 @@ def feature_extraction(home_response):
         list_of_skills.append(str(final_list[i + 1].split('","')[0]))
 
     string_of_skills = ", ".join(list_of_skills)
-
+    print(string_of_designations, file=sys.stderr)
     return locationName, string_of_designations, string_of_skills
 
 
