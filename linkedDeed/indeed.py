@@ -1,9 +1,11 @@
+from __future__ import print_function  # In python 2.
 from bs4 import BeautifulSoup, SoupStrainer  # For HTML parsing
 import urllib2  # Website connections
 import re  # Regular expressions
 import unicodedata
 from time import sleep  # To prevent overwhelming the server between connections
 import pandas as pd  # For converting results to a dataframe and bar chart plots
+import sys
 
 
 def job_extractor(website):
@@ -33,25 +35,37 @@ def clean_up(dirty_data):
                                      replace('\r', ' ')).encode('ascii', 'ignore')
         temp, sep, tail = temp.partition('Apply')
         clean_data.append(temp)
-    """print "*****************"
-                print clean_data"""
     return clean_data
 
 
-def indeed_jobs(f_job, city=None, state=None):
+def indeed_jobs(job=None, location=None):
     """Input the location's city and state and then look for the job in Indeed."""
-    final_job = f_job.lower().replace(' ', '+')  # searching for data scientist exact fit("data scientist" on Indeed search)
     # Make sure the city specified works properly if it has more than one word (such as San Francisco)
-    if city is not None:
-        final_city = city.split()
-        final_city = '+'.join(word for word in final_city)
-        final_site_list = 'http://www.indeed.ca/jobs?q=' + final_job + '&l=' + final_city + '%2C+' + state # Join all of our strings together so that indeed will search correctly
+    if job is not None:
+        final_job = job.lower().replace(' ', '+')
+        if location is not None:
+            location_list = location.split(",", 1)
+            city = location_list[0]
+            state = location_list[1].strip().replace(' ', '+')
+            final_city = city.split()
+            final_city = '+'.join(word for word in final_city)
+            final_site_list = 'http://www.indeed.ca/jobs?q=' + final_job + '&l=' + final_city + '%2C+' + state # Join all of our strings together so that indeed will search correctly
+        else:
+            final_site_list = ['http://www.indeed.ca/jobs?q="', final_job, '"']
     else:
-        final_site_list = ['http://www.indeed.ca/jobs?q="', final_job, '"']
+        if location is not None:
+            location_list = location.split(",", 1)
+            city = location_list[0]
+            state = location_list[1].strip().replace(' ', '+')
+            final_city = city.split()
+            final_city = '+'.join(word for word in final_city)
+            final_site_list = 'http://www.indeed.ca/jobs?q=&l=' + final_city + '%2C+' + state # Join all of our strings together so that indeed will search correctly
+        else:
+            final_site_list = 'https://ca.indeed.com/jobs?q=&l=Nationwide'
 
     final_site = ''.join(final_site_list)  # Merge the html address together into one string
     base_url = 'https://www.indeed.ca/'
-    print final_site_list
+    print(final_site_list, file=sys.stderr)
 
     try:
         html = urllib2.urlopen(final_site).read()  # Open up the front page of our search first
@@ -75,25 +89,25 @@ def indeed_jobs(f_job, city=None, state=None):
     if city is None:
         city_title = 'Nationwide'
 
-    print 'There were', total_num_jobs, 'jobs found,', city_title  # Display how many jobs were found
+    # print 'There were', total_num_jobs, 'jobs found,', city_title  # Display how many jobs were found
     num_pages = total_num_jobs / 10
     # This will be how we know the number of times we need to iterate over each new search result page
     job_descriptions = []  # Store all our descriptions in this list
     final_URLs = []
 
     for i in xrange(0, num_pages):  # Loop through all of our search result pages
-        print 'Getting page', i
+        # print 'Getting page', i
         start_num = str(i * 1)  # Assign the multiplier of 10 to view the pages we want
         current_page = ''.join([final_site, '&start=', start_num])
-        print "So that's the current page"
-        print current_page
+        # print "So that's the current page"
+        # print current_page
         # Now that we can view the correct 10 job returns, start collecting the text samples from each
         html_page = urllib2.urlopen(current_page).read()  # Get the page
         page_obj = BeautifulSoup(html_page, "lxml")  # Locate all of the job links
         for script in page_obj(["script", "style"]):
             script.extract()
 
-        print "And that's the result col"
+        # print "And that's the result col"
         job_link_area = page_obj.find(id='resultsCol')  # The center column on the page where the job postings exist
         job_URLS = [base_url + link.get('href') for link in job_link_area.find_all('a', href=True)]
         job_URLS = filter(lambda x: 'clk' in x, job_URLS)
@@ -108,20 +122,18 @@ def indeed_jobs(f_job, city=None, state=None):
     # code for database connectivity
     import sqlite3
 
-    conn = sqlite3.connect('stuffToPlot.db')
+    conn = sqlite3.connect('linked_deed.db')
     c = conn.cursor()
-    c.execute('DROP TABLE IF EXISTS stuf')
-    c.execute('CREATE TABLE stuf(ID INTEGER PRIMARY KEY AUTOINCREMENT, WHAT TEXT, URL TEXT, ACCURACY REAL, DESCRIPTION TEXT)')
+    c.execute('DROP TABLE IF EXISTS jobs_indeed')
+    c.execute('CREATE TABLE jobs_indeed(ID INTEGER PRIMARY KEY AUTOINCREMENT, WHAT TEXT, URL TEXT, ACCURACY REAL, DESCRIPTION TEXT)')
     for i in range(len(job_descriptions)):
-        c.execute('INSERT INTO stuf (ID, WHAT, URL, ACCURACY, DESCRIPTION) VALUES(?, ?, ?, ?, ?)', ((i + 1), f_job, final_URLs[i], 0.0, new_job_desc[i], ))
+        c.execute('INSERT INTO jobs_indeed (ID, WHAT, URL, ACCURACY, DESCRIPTION) VALUES(?, ?, ?, ?, ?)', ((i + 1), job, final_URLs[i], 0.0, new_job_desc[i], ))
     conn.commit()
     c.close()
     conn.close()
 
-    print 'Done with collecting the job postings!'
-    print 'There were', len(job_descriptions), 'jobs successfully found.'
+    # print 'Done with collecting the job postings!'
+    # print 'There were', len(job_descriptions), 'jobs successfully found.'
 
-"""city='Victoria'
-state='BC'
-f_job='Software Developer'
-indeed_jobs(f_job, city=city, state=state)"""
+
+# indeed_jobs(job=job, location=location)

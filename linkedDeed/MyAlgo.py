@@ -22,15 +22,15 @@ def read_txt(file, text):
 
 def select_from():
     """Reading data from tables."""
-    conn = sqlite3.connect('stuffToPlot.db')
+    conn = sqlite3.connect('linked_deed.db')
     c = conn.cursor()
     jobs = []
-    for row in c.execute('SELECT DESCRIPTION FROM stuf'):
+    for row in c.execute('SELECT DESCRIPTION FROM jobs_indeed'):
         jobs.append(row)
     c.close()
     c = conn.cursor()
     skills = []
-    for row in c.execute('SELECT SKILLS FROM linkedIn'):
+    for row in c.execute('SELECT SKILLS FROM linkedin_skills'):
         skills.append(row)
     c.close()
     conn.close()
@@ -79,8 +79,8 @@ def accuracy(skill_list, text, job_list):
 
 def update_table(match):
     """Update it in sqlite and order this in desc."""
-    conn = sqlite3.connect('stuffToPlot.db')
-    sql = '''UPDATE stuf SET ACCURACY = ? WHERE ID = ?'''
+    conn = sqlite3.connect('linked_deed.db')
+    sql = '''UPDATE jobs_indeed SET ACCURACY = ? WHERE ID = ?'''
     for i in range(len(match)):
         cur = conn.cursor()
         cur.execute(sql, (match[i], i + 1))
@@ -99,4 +99,4 @@ def main():
     match = accuracy(skill_list, text, job_list)
     update_table(match)
 
-main()
+# main()

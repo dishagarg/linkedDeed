@@ -1,26 +1,19 @@
 from __future__ import print_function  # In python 2.
 import sys
 import sqlite3
-from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
+from flask import Flask, request, g, redirect, url_for, render_template
 import indeed as ind
 import MyAlgo as mal
+import linkedin as lik
 
 app = Flask(__name__.split('.')[0])   # create the application instance
 
 
 def connect_db():
     """Connect to the specific database."""
-    rv = sqlite3.connect('stuffToPlot.db')
+    rv = sqlite3.connect('linked_deed.db')
     rv.row_factory = sqlite3.Row
     return rv
-
-
-def init_db():
-    """Initialize the database."""
-    db = get_db()
-    with app.open_resource('schema.sql', mode='r') as f:
-        db.cursor().executescript(f.read())
-    db.commit()
 
 
 def get_db():
@@ -44,13 +37,12 @@ def close_db(error):
 
 @app.route('/')
 def show_entries():
-    init_db()
     db = get_db()
-    cur = db.execute('select WHAT, URL, DESCRIPTION from stuf order by ACCURACY desc')
+    cur = db.execute('SELECT DISTINCT WHAT, URL, DESCRIPTION FROM jobs_indeed order by ACCURACY desc')
     entries = cur.fetchall()
     for job in entries:
         print(dir(job), file=sys.stderr)
-        print(type(job), file=sys.stderr)
+        print(job, file=sys.stderr)
     return render_template('jobs.html', entries=entries)
 
 
@@ -59,13 +51,27 @@ def login():
     url = request.form['url']
     em = request.form['email']
     pwd = request.form['password']
-    what = request.form['what']
-    init_db()
+    lik.main(em, pwd, url)
     db = get_db()
-    db.execute('insert into linkedIn (ID, EMAIL, PASSWORD, WHAT, CITY, STATE, \
-        SKILLS) values (?, ?, ?, ?, ?, ?, ?)', (1, em, pwd, what, 'Victoria', 'BC', 'Java, Python, SQL'))
+    cur = db.execute('SELECT LOCATION, DESIGNATIONS FROM linkedin_skills WHERE ID=1')
+    entry = cur.fetchone()
+    return render_template('form.html', jobs=entry[1].split(", "), location=entry[0].split(", "))
+
+
+@app.route('/form', methods=['POST'])
+def form():
+    what = request.form['what']
+    city = request.form['city']
+    state = request.form['state']
+    location = city + ", " + state
+    print(location, file=sys.stderr)
+    print(what, file=sys.stderr)
+    db = get_db()
+    db.execute('UPDATE linkedin_skills SET DESIGNATIONS = ? WHERE ID = 1', (what, ))
     db.commit()
-    ind.indeed_jobs('Software Developer', city='Victoria', state='BC')
+    db.execute('UPDATE linkedin_skills SET LOCATION = ? WHERE ID = 1', (location, ))
+    db.commit()
+    ind.indeed_jobs(job=what, location=location)
     mal.main()
     return redirect(url_for('show_entries'))
 

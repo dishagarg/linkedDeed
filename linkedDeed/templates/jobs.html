@@ -1,18 +1,16 @@
-{% extends "ass.html" %}
+{% extends "jobs_head.html" %}
 {% block body %}
         <div class="row row-content">
            <div class="col-xs-12">
                <h2>Jobs<small>({{ entries[0][0] }})</small></h2>
-                <ul>
+                <ol>
                 
                 {% for job in entries %}
                     <li>
-                    {% for j in job %}
-                    {% if not loop.first %}{{ j }}<br />{% endif %}
-                    {% endfor %}
+                    <a href="{{ job[1] }}">{{ job[1] }}</a><br />
                     </li>
                 {% endfor %}
-               </ul>
+               </ol>
             </div>
         </div>
 {% endblock %}
