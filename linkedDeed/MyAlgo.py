@@ -73,7 +73,7 @@ def accuracy(skill_list, text, job_list):
         y = jobs_calc(skill_list, job)
         # skills_required.append(x)
         # skills_match.append(y)
-        match.append((float(y) / x) * 100)
+        match.append((float(y) / (x + 1)) * 100)
     return match
 
 
