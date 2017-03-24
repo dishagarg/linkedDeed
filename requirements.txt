@@ -7,7 +7,6 @@ jsonschema==2.5.1
 lxml==3.7.3
 MarkupSafe==0.23
 nltk==3.1
-numpy==1.11.2+mkl
 oauthlib==2.0.1
 pandas==0.18.0
 pickleshare==0.6
