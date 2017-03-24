@@ -40,9 +40,6 @@ def show_entries():
     db = get_db()
     cur = db.execute('SELECT DISTINCT WHAT, URL, DESCRIPTION FROM jobs_indeed order by ACCURACY desc')
     entries = cur.fetchall()
-    for job in entries:
-        print(dir(job), file=sys.stderr)
-        print(job, file=sys.stderr)
     return render_template('jobs.html', entries=entries)
 
 
@@ -55,7 +52,7 @@ def login():
     db = get_db()
     cur = db.execute('SELECT LOCATION, DESIGNATIONS FROM linkedin_skills WHERE ID=1')
     entry = cur.fetchone()
-    print(entry[1].split(", "), file=sys.stderr)
+    # print(entry[1].split(", "), file=sys.stderr)
     return render_template('form.html', jobs=entry[1].split(", "), location=entry[0].split(", "))
 
 
@@ -65,8 +62,6 @@ def form():
     city = request.form['city']
     state = request.form['state']
     location = city + ", " + state
-    print(location, file=sys.stderr)
-    print(what, file=sys.stderr)
     db = get_db()
     db.execute('UPDATE linkedin_skills SET DESIGNATIONS = ? WHERE ID = 1', (what, ))
     db.commit()

@@ -65,7 +65,7 @@ def indeed_jobs(job=None, location=None):
 
     final_site = ''.join(final_site_list)  # Merge the html address together into one string
     base_url = 'https://www.indeed.ca/'
-    print(final_site_list, file=sys.stderr)
+    # print(final_site_list, file=sys.stderr)
 
     try:
         html = urllib2.urlopen(final_site).read()  # Open up the front page of our search first

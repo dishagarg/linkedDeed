@@ -62,8 +62,11 @@
     <script type="text/javascript">
         function CheckItems(val){
          var element=document.getElementById('what');
-         if(val=='choose'||val=='others')
+         var element2=document.getElementById('sel');
+         if(val=='choose'||val=='others'){
            element.style.display='block';
+            element2.name='blah';
+         }
          else  
            element.style.display='none';
         }

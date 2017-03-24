@@ -4,7 +4,7 @@
     <div class="form-group">
         <label for="what" class="col-sm-2 control-label">What kind of JOB?</label>
         <div class="col-sm-3">
-            <select class="form-control" name="what" onchange='CheckItems(this.value);'> 
+            <select class="form-control" id="sel" name="what" onchange='CheckItems(this.value);'> 
                 <option value="choose">What do you want to be?</option> 
                 {% for job in jobs %}
                 <option value="{{ job }}">{{ job }}</option>
