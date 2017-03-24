@@ -84,8 +84,8 @@ def update_table(match):
     for i in range(len(match)):
         cur = conn.cursor()
         cur.execute(sql, (match[i], i + 1))
-        conn.commit()
         cur.close()
+    conn.commit()
     conn.close()
 
 

@@ -33,7 +33,7 @@ def clean_up(dirty_data):
         temp = unicodedata.normalize('NFKD', "".join(dirty_data[i]).replace('\n', ' ').
                                      replace('\[[0-9]*\]', "").replace(' +', ' ').replace('\t', "").
                                      replace('\r', ' ')).encode('ascii', 'ignore')
-        temp, sep, tail = temp.partition('Apply')
+        # temp, sep, tail = temp.partition('Apply')
         clean_data.append(temp)
     return clean_data
 
