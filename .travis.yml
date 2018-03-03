@@ -1,0 +1,15 @@
+language: python
+python:
+- '2.6'
+- '2.7'
+install:
+- pip install -r requirements.txt
+deploy:
+  provider: heroku
+  skip_cleanup: true
+  strategy: git
+  api_key:
+    secure: CpLaMto3KewPNkhGMeBQWAa35J7Fvy9hVP7tLjXA70fsYRUbT34o0q56ghJ6NSMs2kobJOvbYje3XSFDGDaOcav6G0DTizkDJvWe5ACui52zbaAVluaHe9WkFZYs012/ICkkf7A1Z5e7EiIlbVgM4YvbnsvtQVj6cOHvSnzOdlelk1/Yt1wX/dIR1Urx/H29WZGnULQpmAQyN4NXx2dUQhk83lqN5yiUOvn+83vb19wccfgL/rO1zBH7Cc1k3JhM+64al4EBuTX48/3n8XcErRsvNrDpJKnUxONokk/+1B40ZFdAoxiyr7OTYoAFbKhCugIsFjqo9kzNVls4LaLJxvspVwDBjbFfMn8SjdY95TDOyb6pBEOeXyp9+QOymElLZlyudE9qZNiArUhLhwFAwwxZ29c8Z4bO+Of+uUj5duwItm67OksBMwnyNN9yQhkRdmyejsz8Fau1UhEikww3SzSUWwmUWdF48tGLR57lzo6GVwyvJtBgMFdj4WrCnhliaCOEmznTpWardrJs6kR/8TtLXxWIuWi6JILb50hDvxf82rc05zUhJz5BTT99WLXU8qsv+vcbPT2F/h5l13Z7KfJ2K9o4pHPZn2Tg/7iJG2OWjkSr8N7h+ZITr++SagJgCVQcdU311dq0ya1HV11DYUcB69uBHB67HbdFWW1zxVI=
+  message: The Deployment is being done! I guess?!
+  on:
+    branch: master
